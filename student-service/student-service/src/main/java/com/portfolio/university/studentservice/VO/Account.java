@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 public class Account {
 
 	private Long accountNumber;
-	private List<Course> courses = new ArrayList<>();
+	private List<Course> coursesAttended = new ArrayList<>();
 }

@@ -12,8 +12,6 @@ import com.portfolio.university.studentservice.VO.FinancialResponseTemplate;
 import com.portfolio.university.studentservice.entity.Student;
 import com.portfolio.university.studentservice.service.StudentService;
 
-import lombok.extern.slf4j.Slf4j;
-
 @RestController
 @RequestMapping("/students")
 public class StudentController {

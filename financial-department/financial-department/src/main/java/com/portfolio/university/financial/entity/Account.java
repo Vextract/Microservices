@@ -25,3 +25,4 @@ public class Account {
 	@OneToMany(cascade = CascadeType.ALL)
 	private List<Course> coursesAttended = new ArrayList<>();
 }
+

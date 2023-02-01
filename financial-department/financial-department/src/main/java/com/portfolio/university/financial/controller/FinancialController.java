@@ -1,5 +1,7 @@
 package com.portfolio.university.financial.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,12 +37,17 @@ public class FinancialController {
 	}
 	
 	@GetMapping("/accounts/{id}")
-	public Account findAccountByNumber(@PathVariable("id") Long number) {
-		return financialService.findAccountByNumber(number);
+	public Account findAccountByNumber(@PathVariable("id") Long accountNumber) {
+		return financialService.findAccountByNumber(accountNumber);
 	}
 	
 	@GetMapping("/courses/{id}")
 	public Course findCourseByCourseId(@PathVariable("id") Long courseId) {
 		return financialService.findCourseByCourseId(courseId);
+	}
+	
+	@GetMapping("/courses/allfrom/{id}")
+	public List<Course> findCoursesByAccountNumber(@PathVariable("id") Long accountNumber) {
+		return financialService.findCoursesByAccountNumber(accountNumber);
 	}
 }

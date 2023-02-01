@@ -34,10 +34,6 @@ public class FinancialService {
 		return courseRepository.findCourseByCourseId(courseId);
 	}
 
-	public List<Course> findAllCoursesByStudentId(Long studentId) {
-		return null;
-	}
-
 	public String addCourseToAccount(Long accountNumber, Long courseId) {
 		try {
 			Account account = accountRepository.findByAccountNumber(accountNumber);
@@ -49,5 +45,10 @@ public class FinancialService {
 		} catch (Exception e) {
 			return "Something went wrong";
 		}
+	}
+
+	public List<Course> findCoursesByAccountNumber(Long accountNumber) {
+		Account account = findAccountByNumber(accountNumber);
+		return account.getCoursesAttended();
 	}
 }
