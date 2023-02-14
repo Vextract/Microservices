@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.client.RestTemplate;
 
@@ -16,6 +17,7 @@ import com.portfolio.university.studentservice.VO.Course;
 import com.portfolio.university.studentservice.entity.Student;
 import com.portfolio.university.studentservice.repository.StudentRepository;
 
+@SpringBootTest
 class StudentServiceTest {
 
 	@Autowired
@@ -42,9 +44,28 @@ class StudentServiceTest {
 		
 		Mockito.when(studentRepository.findByStudentId(15L))
 		.thenReturn(student);
-		Mockito.when(restTemplate.)
+		Mockito.when(restTemplate.getForObject("http://FINANCIAL-DEPARTMENT/financial/accounts/" +
+						student.getAccountNumber(), Account.class))
+		.thenReturn(account);
+		
+		
+	}
+	
+	@Test
+	public void whenValidId_thenStudentShouldBeFound() {
+		
 	}
 
-	public void 
+	@Test
+	public void whenValidId_thenStudentShouldBeFoundWithAccount() {
+		Long id = 15L;
+		String studentName = "John Doe";
+		String courseName = "Math";
+		Student studentFound = underTest.getStudentWithAccount(id).getStudent();
+		Course courseFound = underTest.getStudentWithAccount(id).getAccount().getCoursesAttended().get(0);
+		
+		assertEquals(studentName, studentFound.getName());
+		assertEquals(courseName, courseFound.getCourseName());
+	}
 		
 }
