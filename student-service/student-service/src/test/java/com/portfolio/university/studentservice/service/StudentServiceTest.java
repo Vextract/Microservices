@@ -1,19 +1,25 @@
 package com.portfolio.university.studentservice.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.any;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.event.annotation.BeforeTestMethod;
 import org.springframework.web.client.RestTemplate;
 
 import com.portfolio.university.studentservice.VO.Account;
 import com.portfolio.university.studentservice.VO.Course;
+import com.portfolio.university.studentservice.VO.FinancialResponseTemplate;
 import com.portfolio.university.studentservice.entity.Student;
 import com.portfolio.university.studentservice.repository.StudentRepository;
 
@@ -25,7 +31,7 @@ class StudentServiceTest {
 	
 	@MockBean
 	private StudentRepository studentRepository;
-	
+		
 	@MockBean
 	private RestTemplate restTemplate;
 	
@@ -42,18 +48,41 @@ class StudentServiceTest {
 		Account account = 
 				new Account(99L, List.of(math,physics));
 		
+		Student student2 = new Student();
+		student2.setStudentId(10L);
+		
+		Mockito.when(studentRepository.findByStudentId(10L))
+		.thenReturn(student2);
+		
 		Mockito.when(studentRepository.findByStudentId(15L))
 		.thenReturn(student);
+		
 		Mockito.when(restTemplate.getForObject("http://FINANCIAL-DEPARTMENT/financial/accounts/" +
 						student.getAccountNumber(), Account.class))
 		.thenReturn(account);
 		
-		
 	}
 	
 	@Test
-	public void whenValidId_thenStudentShouldBeFound() {
+	public void whenValidStudent_thenShouldSaveProperly() {
+		Student student = 
+				new Student(15L, 
+						"John Doe", 
+						"1, Whatever Str, Tel Aviv", 
+						"some@mock.com", 
+						99L);
 		
+		underTest.saveUser(student);
+		
+		ArgumentCaptor<Student> studentArgumentCaptor = 
+				ArgumentCaptor.forClass(Student.class);
+		
+		verify(studentRepository)
+		.save(studentArgumentCaptor.capture());
+		
+		Student capturedStudent = studentArgumentCaptor.getValue();
+		
+		assertThat(capturedStudent).isEqualTo(student);
 	}
 
 	@Test
@@ -61,11 +90,31 @@ class StudentServiceTest {
 		Long id = 15L;
 		String studentName = "John Doe";
 		String courseName = "Math";
-		Student studentFound = underTest.getStudentWithAccount(id).getStudent();
-		Course courseFound = underTest.getStudentWithAccount(id).getAccount().getCoursesAttended().get(0);
+		FinancialResponseTemplate template = underTest.getStudentWithAccount(id);
+		Student studentFound = template.getStudent();
+		Course courseFound = template.getAccount().getCoursesAttended().get(0);
 		
+		verify(studentRepository).findByStudentId(id);
+		verify(restTemplate).getForObject("http://FINANCIAL-DEPARTMENT/financial/accounts/" +
+						studentFound.getAccountNumber(), Account.class);
 		assertEquals(studentName, studentFound.getName());
 		assertEquals(courseName, courseFound.getCourseName());
+	}
+	
+	@Test
+	public void whenValidIdAndNumber_ThenShouldAssignAccountToStudent() {
+		Student student = new Student();
+		student.setStudentId(10L);
+		Account account = new Account();
+		account.setAccountNumber(15L);
+		
+		underTest.assignAccountNumberToStudent(student.getStudentId(), account.getAccountNumber());
+		
+		verify(studentRepository).findByStudentId(student.getStudentId());
+		student.setAccountNumber(account.getAccountNumber());
+		verify(studentRepository).save(student);
+		
+		assertEquals(student.getAccountNumber(), account.getAccountNumber());
 	}
 		
 }
