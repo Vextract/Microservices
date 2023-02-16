@@ -1,7 +1,6 @@
 package com.portfolio.university.studentservice.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.any;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 
@@ -14,7 +13,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.event.annotation.BeforeTestMethod;
 import org.springframework.web.client.RestTemplate;
 
 import com.portfolio.university.studentservice.VO.Account;
@@ -37,6 +35,7 @@ class StudentServiceTest {
 	
 	@BeforeEach
 	void setUp() {
+		//For assignAccountNumberToStudent()
 		Student student = 
 				new Student(15L, 
 						"John Doe", 
@@ -48,12 +47,6 @@ class StudentServiceTest {
 		Account account = 
 				new Account(99L, List.of(math,physics));
 		
-		Student student2 = new Student();
-		student2.setStudentId(10L);
-		
-		Mockito.when(studentRepository.findByStudentId(10L))
-		.thenReturn(student2);
-		
 		Mockito.when(studentRepository.findByStudentId(15L))
 		.thenReturn(student);
 		
@@ -61,6 +54,15 @@ class StudentServiceTest {
 						student.getAccountNumber(), Account.class))
 		.thenReturn(account);
 		
+		//For saveUser()
+		Student student2 = new Student();
+		student2.setStudentId(10L);
+		
+		Mockito.when(studentRepository.findByStudentId(10L))
+		.thenReturn(student2);
+		
+		//For throwable in assignAccountNumberToStudent()
+		Mockito.when(studentRepository.findByStudentId(20L)).thenThrow(new NullPointerException());
 	}
 	
 	@Test
@@ -115,6 +117,13 @@ class StudentServiceTest {
 		verify(studentRepository).save(student);
 		
 		assertEquals(student.getAccountNumber(), account.getAccountNumber());
+	}
+	
+	@Test
+	public void whenNotValidIdOrNumber_ThenShouldReturnMessage() {
+		Account account = new Account();
+		account.setAccountNumber(15L);
+		assertEquals(underTest.assignAccountNumberToStudent(20L, 15L), "Something went wrong");
 	}
 		
 }

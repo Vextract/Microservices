@@ -9,7 +9,10 @@ import com.portfolio.university.studentservice.VO.FinancialResponseTemplate;
 import com.portfolio.university.studentservice.entity.Student;
 import com.portfolio.university.studentservice.repository.StudentRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class StudentService {
 
 	@Autowired
@@ -39,6 +42,7 @@ public class StudentService {
 			studentRepository.save(student);
 			return "Assigned account number " + accountNumber + " to ID " + studentId;
 		} catch (Exception e) {
+			log.debug(e.getMessage());
 			return "Something went wrong";
 		}
 	}
