@@ -67,6 +67,7 @@ class StudentServiceTest {
 	
 	@Test
 	public void whenValidStudent_thenShouldSaveProperly() {
+		
 		Student student = 
 				new Student(15L, 
 						"John Doe", 
@@ -75,13 +76,9 @@ class StudentServiceTest {
 						99L);
 		
 		underTest.saveUser(student);
-		
 		ArgumentCaptor<Student> studentArgumentCaptor = 
 				ArgumentCaptor.forClass(Student.class);
-		
-		verify(studentRepository)
-		.save(studentArgumentCaptor.capture());
-		
+		verify(studentRepository).save(studentArgumentCaptor.capture());
 		Student capturedStudent = studentArgumentCaptor.getValue();
 		
 		assertThat(capturedStudent).isEqualTo(student);
@@ -89,6 +86,7 @@ class StudentServiceTest {
 
 	@Test
 	public void whenValidId_thenStudentShouldBeFoundWithAccount() {
+		
 		Long id = 15L;
 		String studentName = "John Doe";
 		String courseName = "Math";
@@ -99,8 +97,9 @@ class StudentServiceTest {
 		verify(studentRepository).findByStudentId(id);
 		verify(restTemplate).getForObject("http://FINANCIAL-DEPARTMENT/financial/accounts/" +
 						studentFound.getAccountNumber(), Account.class);
-		assertEquals(studentName, studentFound.getName());
-		assertEquals(courseName, courseFound.getCourseName());
+		
+		assertThat(studentFound.getName()).isEqualTo(studentName);
+		assertThat(courseFound.getCourseName()).isEqualTo(courseName);
 	}
 	
 	@Test
@@ -117,13 +116,16 @@ class StudentServiceTest {
 		verify(studentRepository).save(student);
 		
 		assertEquals(student.getAccountNumber(), account.getAccountNumber());
+		assertThat(account.getAccountNumber()).isEqualTo(student.getAccountNumber());
 	}
 	
 	@Test
-	public void whenNotValidIdOrNumber_ThenShouldReturnMessage() {
+	public void whenNotValidId_ThenShouldReturnMessage() {
 		Account account = new Account();
+		
 		account.setAccountNumber(15L);
-		assertEquals(underTest.assignAccountNumberToStudent(20L, 15L), "Something went wrong");
+		
+		assertEquals(underTest.assignAccountNumberToStudent(20L, 15L), "Something went wrong. Please try again later.");
 	}
 		
 }

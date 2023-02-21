@@ -41,9 +41,9 @@ public class StudentService {
 			student.setAccountNumber(accountNumber);
 			studentRepository.save(student);
 			return "Assigned account number " + accountNumber + " to ID " + studentId;
-		} catch (Exception e) {
-			log.debug(e.getMessage());
-			return "Something went wrong";
+		} catch (NullPointerException e) {
+			log.info(e.getMessage());
+			return "Something went wrong. Please try again later.";
 		}
 	}
 
